@@ -1023,15 +1023,16 @@ const FIGURINHAS = [
   }
 ];
 const STORAGE_KEY = "album_dupla_exclusao_v4_72";
+const ASSET_VERSION = "20260528-fix2332";
 const FIGS_POR_PACOTE = 5;
 const CREDITOS = 'Realização: <b>Escola Pedro de Queiroz Ferreira</b> • Idealização e coordenação pedagógica: <b>Prof. Cleilson Paiva</b> • Projeto gráfico e diagramação: <b>Prof. Carlos Tavares</b>';
 let audioAtivo = true, audioLiberado = false, audio = {};
 function setupAudio(){
-  audio.bg = new Audio("audio/album/bg-adventure.mp3");
-  audio.pack = new Audio("audio/album/pack-open.mp3");
-  audio.page = new Audio("audio/album/page-turn.mp3");
-  audio.click = new Audio("audio/album/click.mp3");
-  audio.sticker = new Audio("audio/album/sticker-place.mp3");
+  audio.bg = new Audio(`audio/album/bg-adventure.mp3?v=${ASSET_VERSION}`);
+  audio.pack = new Audio(`audio/album/pack-open.mp3?v=${ASSET_VERSION}`);
+  audio.page = new Audio(`audio/album/page-turn.mp3?v=${ASSET_VERSION}`);
+  audio.click = new Audio(`audio/album/click.mp3?v=${ASSET_VERSION}`);
+  audio.sticker = new Audio(`audio/album/sticker-place.mp3?v=${ASSET_VERSION}`);
   Object.values(audio).forEach(a=>{a.preload="auto"});
   audio.bg.loop = true; audio.bg.volume=.16; audio.pack.volume=.55; audio.page.volume=.55; audio.click.volume=.45; audio.sticker.volume=.55;
   atualizarBotaoAudio();
@@ -1076,7 +1077,7 @@ function safe(t){return String(t??"").replace(/[&<>"']/g,s=>({"&":"&amp;","<":"&
 function pad(n){return String(n).padStart(2,"0")}
 function caminhosImagem(num){
   const n2=pad(num);
-  return [`figurinhas/${n2}.webp`];
+  return [`figurinhas/${n2}.webp?v=${ASSET_VERSION}`];
 }
 function imgFallback(el){
   const lista = JSON.parse(el.dataset.fallback || "[]");
