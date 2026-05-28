@@ -142,6 +142,8 @@ button{font-family:inherit;cursor:pointer}
 .quiz-opcao.selecionada{background:linear-gradient(135deg,#ffe99a,var(--gold));color:#06142e}
 .quiz-opcao b{display:inline-block;min-width:28px;color:var(--gold)}
 .quiz-opcao.selecionada b{color:#06142e}
+.quiz-opcao.bloqueado,.quiz-opcao:disabled{opacity:.45;cursor:not-allowed;background:rgba(148,163,184,.18);color:#cbd5e1}
+.quiz-status{margin-top:10px;padding:10px;border-radius:12px;background:rgba(255,255,255,.07);border:1px solid rgba(246,200,76,.25);color:#e5e7eb;font-size:.86rem;line-height:1.35}
 
 .codigo-brinde{
   margin-top:14px;
@@ -182,7 +184,7 @@ button{font-family:inherit;cursor:pointer}
 }
 
 @media(max-width:1100px){.palco{grid-template-columns:1fr}.lateral{display:none}.resultado{grid-template-columns:repeat(2,1fr)}}
-@media(max-width:760px){html,body{overflow:auto}.app{height:auto;min-height:100vh}.palco{height:auto}.area{height:auto;min-height:calc(100vh - 80px)}.livro{display:block;height:auto}.pagina{min-height:720px;margin-bottom:12px}.miolo{display:none}.ficha-rev{grid-template-columns:1fr}.resultado{grid-template-columns:1fr}.topo{align-items:flex-start}.marca{min-width:190px}.topo nav{gap:5px}.topo button{padding:8px 9px;font-size:.68rem}}
+@media(max-width:760px){html,body{overflow:hidden}.app{height:100vh;min-height:100vh;grid-template-rows:auto 1fr}.topo{align-items:flex-start;padding:7px;gap:6px}.marca{min-width:170px}.marca b{font-size:.82rem}.marca small{font-size:.56rem}.topo nav{gap:4px}.topo button{padding:7px 8px;font-size:.62rem}.palco{height:calc(100vh - 68px);padding:6px;grid-template-columns:1fr}.lateral{display:none}.area{height:100%;min-height:0;grid-template-rows:42px 1fr}.barra{padding:5px 8px}.barra b{font-size:.76rem}.barra span{font-size:.61rem}.livro,.livro.mobile-uma-pagina{display:grid;grid-template-columns:1fr;height:100%;min-height:0}.livro .esquerda,.livro .miolo{display:none!important}.pagina{height:100%;min-height:0;margin:0;border-radius:18px!important;padding:6px}.page-inner{padding:8px 0 18px;gap:5px}.page-head{padding-left:42px}.page-head h2{font-size:.96rem}.texto-pagina{font-size:.62rem;padding:5px}.grid-fig{gap:5px}.acao{height:25px;font-size:.52rem}.placeholder .num{font-size:1.25rem}.placeholder .tema{font-size:.46rem}.estado{font-size:.48rem;padding:2px 5px}.pagina-especial{padding:8px 5px 18px;gap:8px}.pagina-especial h2{font-size:1.15rem}.pagina-especial p{font-size:.75rem}.info-grid{gap:6px}.info-card{padding:8px}.info-card span{font-size:1.05rem}.resultado{grid-template-columns:1fr}.ficha-rev{grid-template-columns:1fr}.card-modal{max-height:94vh;padding:14px}.ficha-img{height:300px}}
 
 .promo-radar{position:relative;z-index:2;height:100%;display:grid;grid-template-rows:auto 1fr auto;gap:12px;padding:16px 14px 26px;color:#fff;text-align:center;overflow:hidden}
 .promo-radar:before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 20% 15%,rgba(34,197,94,.22),transparent 26%),radial-gradient(circle at 80% 20%,rgba(59,130,246,.25),transparent 30%),linear-gradient(145deg,rgba(2,6,23,.72),rgba(15,23,42,.92));z-index:-1}
@@ -1052,7 +1054,7 @@ function alternarAudio(){
 }
 document.addEventListener("click", liberarAudio, {once:true});
 
-function estadoInicial(){return {album:{}, pacotes:3, historico:[], quizFeitos:0, codigosResgatados:{}}}
+function estadoInicial(){return {album:{}, pacotes:3, historico:[], quizFeitos:0, codigosResgatados:{}, simuladosRespondidos:[]}}
 function carregar(){
   try{
     const salvo=JSON.parse(localStorage.getItem(STORAGE_KEY));
@@ -1061,7 +1063,8 @@ function carregar(){
       ...(salvo||{}),
       album:(salvo&&salvo.album)||{},
       historico:(salvo&&salvo.historico)||[],
-      codigosResgatados:(salvo&&salvo.codigosResgatados)||{}
+      codigosResgatados:(salvo&&salvo.codigosResgatados)||{},
+      simuladosRespondidos:Array.isArray(salvo&&salvo.simuladosRespondidos)?salvo.simuladosRespondidos:[]
     };
   }catch(e){return estadoInicial()}
 }
@@ -1072,20 +1075,15 @@ function reg(id){if(!estado.album[id]) estado.album[id]={quantidade:0,colada:fal
 function safe(t){return String(t??"").replace(/[&<>"']/g,s=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[s]))}
 function pad(n){return String(n).padStart(2,"0")}
 function caminhosImagem(num){
-  const n2=pad(num), n=String(num);
-  return [
-    `figurinhas/figurinha-${n2}.webp`, `figurinhas/${n2}.webp`, `figurinhas/figurinha-${n}.webp`,
-    `figurinhas/Figurinha-${n2}.webp`, `figurinhas/FIGURINHA-${n2}.webp`,
-    `figurinhas/figurinha-${n2}.png`, `figurinhas/${n2}.png`, `figurinhas/figurinha-${n2}.jpg`, `figurinhas/figurinha-${n2}.jpeg`,
-    `figurinhas/figurinha-${n2}.svg`
-  ];
+  const n2=pad(num);
+  return [`figurinhas/${n2}.webp`];
 }
 function imgFallback(el){
   const lista = JSON.parse(el.dataset.fallback || "[]");
   const i = Number(el.dataset.i || 0) + 1;
   if(i < lista.length){el.dataset.i=i; el.src=lista[i]; return}
   const num = el.dataset.num || "";
-  el.outerHTML = `<div class="placeholder"><div class="num">${num}</div><div class="tema">Imagem não encontrada<br>cole em figurinhas/figurinha-${num}.webp</div></div>`;
+  el.outerHTML = `<div class="placeholder"><div class="num">${num}</div><div class="tema">Imagem não encontrada<br>cole em figurinhas/${num}.webp</div></div>`;
 }
 function imagemHTML(fig){
   const lista=caminhosImagem(fig.numero);
@@ -1144,7 +1142,7 @@ function especialHTML(p){
   if(p.tipo==="como") return `${creditosHTML()}<div class="pagina-especial"><h2>Como usar este álbum</h2><div><p>1. Abra os 3 pacotes iniciais. Cada pacote mostra 5 figurinhas.</p><p>2. As figurinhas recebidas ficam disponíveis, mas não colam automaticamente.</p><p>3. Vá até a página correspondente e clique em <b>Colar figurinha</b>.</p><p>4. Só depois de colada a ficha técnica será aberta.</p></div><div class="info-grid"><div class="info-card"><b>Figurinhas</b><span>72</span></div><div class="info-card"><b>Pacote</b><span>5</span></div><div class="info-card"><b>Início</b><span>3 pacotes</span></div><div class="info-card"><b>Simulado</b><span>+1 ou +3</span></div></div></div>`;
   if(p.tipo==="simulado"){
     const t=totais();
-    return `${creditosHTML()}<div class="pagina-especial"><h2>Simulado do Tema</h2><div><p>Responda 10 questões sobre racismo, capacitismo, acessibilidade e inclusão escolar.</p><p><b>10 acertos:</b> ganha 3 pacotes. <b>Até 9 acertos:</b> ganha 1 pacote.</p></div><div class="info-grid"><div class="info-card"><b>10 acertos</b><span>3 pacotes</span></div><div class="info-card"><b>Até 9 acertos</b><span>1 pacote</span></div><div class="info-card"><b>Figurinhas por pacote</b><span>5</span></div><div class="info-card"><b>Pacotes disponíveis</b><span>${t.pacotes}</span></div></div><button class="btn-dourado" onclick="abrirQuiz()">Iniciar simulado</button></div>`;
+    return `${creditosHTML()}<div class="pagina-especial"><h2>Simulado do Tema</h2><div><p>Responda 10 questões sobre racismo, capacitismo, acessibilidade e inclusão escolar.</p><p><b>10 acertos:</b> ganha 3 pacotes. <b>Até 9 acertos:</b> ganha 1 pacote.</p><p><b>Regra:</b> ao responder um simulado, ele fica bloqueado e só libera os restantes. Ao concluir os 5, todos ficam liberados novamente.</p></div><div class="info-grid"><div class="info-card"><b>10 acertos</b><span>3 pacotes</span></div><div class="info-card"><b>Até 9 acertos</b><span>1 pacote</span></div><div class="info-card"><b>Figurinhas por pacote</b><span>5</span></div><div class="info-card"><b>Pacotes disponíveis</b><span>${t.pacotes}</span></div></div><button class="btn-dourado" onclick="abrirQuiz()">Iniciar simulado</button></div>`;
   }
   if(p.tipo==="radar"){
     return `${creditosHTML()}<div class="promo-radar"><div><span class="selo-copa">Conheça também</span><h2>Radar Copa 2026</h2><h3>Álbum digital com figurinhas, pacotes e experiência interativa</h3></div><div class="promo-box"><ul><li>Abra pacotes virtuais e cole figurinhas no álbum.</li><li>Projeto ideal para engajar alunos, visitantes e comunidade escolar.</li><li>Acesse pelo QR Code e conheça a versão Radar Copa 2026.</li></ul><div class="qr-card"><img src="img/qrcode-radar-copa.png" alt="QR Code Radar Copa 2026"><b>Aponte a câmera do celular</b></div></div><div class="cta-radar">Escaneie e veja o Álbum Radar Copa 2026</div><div class="link-radar">https://dev-orient-social.github.io/radar-copa-2026-com-album/</div></div>`;
@@ -1171,6 +1169,7 @@ function paginaFigHTML(p){
   </div>`;
 }
 function renderPagina(p){return p.tipo==="figs" ? paginaFigHTML(p) : especialHTML(p)}
+function isMobile(){return window.matchMedia && window.matchMedia("(max-width:760px)").matches}
 function renderLivro(){
   if(paginaAtual<1)paginaAtual=1;if(paginaAtual>totalPaginas())paginaAtual=totalPaginas();
   localStorage.setItem("pagina_dupla_exclusao_v4", paginaAtual);
@@ -1178,8 +1177,20 @@ function renderLivro(){
   document.getElementById("paginaAtual").textContent=`Página ${paginaAtual} de ${totalPaginas()}`;
   document.getElementById("tituloPagina").textContent=p.titulo;
   const livro=document.getElementById("livro"), esq=document.getElementById("paginaEsquerda"), dir=document.getElementById("paginaDireita");
-  if(paginaAtual===1){livro.classList.add("capa");dir.innerHTML=renderPagina(p);esq.innerHTML=""}
-  else{livro.classList.remove("capa");const base=par(paginaAtual);esq.innerHTML=renderPagina(pagina(base));dir.innerHTML=base+1<=totalPaginas()?renderPagina(pagina(base+1)):""}
+  if(isMobile()){
+    livro.classList.add("mobile-uma-pagina");
+    livro.classList.remove("capa");
+    esq.innerHTML="";
+    dir.innerHTML=renderPagina(p);
+  }
+  else if(paginaAtual===1){
+    livro.classList.remove("mobile-uma-pagina");
+    livro.classList.add("capa");dir.innerHTML=renderPagina(p);esq.innerHTML=""
+  }
+  else{
+    livro.classList.remove("mobile-uma-pagina");
+    livro.classList.remove("capa");const base=par(paginaAtual);esq.innerHTML=renderPagina(pagina(base));dir.innerHTML=base+1<=totalPaginas()?renderPagina(pagina(base+1)):""
+  }
   atualizarStatus();
 }
 function atualizarStatus(){
@@ -1189,8 +1200,8 @@ function atualizarStatus(){
   document.getElementById("totalPacotes").textContent=t.pacotes;
   document.getElementById("pacotesTopo").textContent=t.pacotes;
 }
-function proxima(){if(paginaAtual<totalPaginas()){paginaAtual=paginaAtual===1?2:par(paginaAtual)+2;playSom("page");renderLivro()}}
-function anterior(){if(paginaAtual>1){paginaAtual=paginaAtual<=2?1:par(paginaAtual)-2;playSom("page");renderLivro()}}
+function proxima(){if(paginaAtual<totalPaginas()){paginaAtual=isMobile()?paginaAtual+1:(paginaAtual===1?2:par(paginaAtual)+2);playSom("page");renderLivro()}}
+function anterior(){if(paginaAtual>1){paginaAtual=isMobile()?paginaAtual-1:(paginaAtual<=2?1:par(paginaAtual)-2);playSom("page");renderLivro()}}
 function irParaFigurinha(paginaImpressa){
   const alvo = paginas().find(p=>p.tipo==="figs" && p.paginaAlbum===paginaImpressa);
   if(alvo){paginaAtual = alvo.numero; playSom("page"); document.getElementById("modalPacote").classList.remove("ativo"); renderLivro();}
@@ -1371,17 +1382,37 @@ window.abrirQuiz=function(){
   renderQuizMenu();
 }
 
+function simuladosRespondidos(){
+  if(!Array.isArray(estado.simuladosRespondidos)) estado.simuladosRespondidos=[];
+  estado.simuladosRespondidos=[...new Set(estado.simuladosRespondidos.map(Number).filter(n=>n>=0 && n<SIMULADOS.length))];
+  if(estado.simuladosRespondidos.length>=SIMULADOS.length){
+    estado.simuladosRespondidos=[];
+    salvar();
+  }
+  return estado.simuladosRespondidos;
+}
+function simuladoBloqueado(i){return simuladosRespondidos().includes(i)}
+function restantesSimulados(){return SIMULADOS.length-simuladosRespondidos().length}
+
 function renderQuizMenu(){
   const area=document.getElementById("quizArea");
+  const feitos=simuladosRespondidos();
+  const restantes=SIMULADOS.length-feitos.length;
   area.innerHTML=`
     <div class="pergunta-box">
       <h2 style="color:#fff">Escolha um simulado</h2>
       <p style="color:#cbd5e1;margin-top:8px">São 5 simulados com 10 questões cada, todos sobre Dupla Exclusão, racismo, capacitismo, acessibilidade, direitos e inclusão escolar.</p>
-      ${SIMULADOS.map((s,i)=>`<button class="quiz-opcao" onclick="iniciarSimulado(${i})">${i+1}. ${safe(s.titulo)}</button>`).join("")}
+      <div class="quiz-status"><b>Nova regra:</b> depois que o aluno responde um simulado, ele fica bloqueado nesta rodada. Restam <b>${restantes}</b> simulado(s). Quando todos os 5 forem respondidos, a rodada reinicia e todos ficam liberados novamente.</div>
+      ${SIMULADOS.map((s,i)=>{
+        const bloqueado=feitos.includes(i);
+        const label=bloqueado?" — respondido nesta rodada":"";
+        return `<button class="quiz-opcao ${bloqueado?'bloqueado':''}" ${bloqueado?'disabled':''} onclick="iniciarSimulado(${i})">${i+1}. ${safe(s.titulo)}${label}</button>`
+      }).join("")}
     </div>`;
 }
 
 window.iniciarSimulado=function(i){
+  if(simuladoBloqueado(i)){alert("Este simulado já foi respondido nesta rodada. Escolha um dos simulados restantes.");renderQuizMenu();return}
   simuladoAtual=i;
   respostas={};
   renderQuiz();
@@ -1410,12 +1441,20 @@ window.marcarResposta=function(i,j){respostas[i]=j;renderQuiz()}
 window.finalizarQuiz=function(){
   const QUESTOES=questoesAtuais();
   if(Object.keys(respostas).length<QUESTOES.length){alert("Responda todas as 10 questões.");return}
+  if(simuladoBloqueado(simuladoAtual)){alert("Este simulado já foi respondido nesta rodada.");renderQuizMenu();return}
   let acertos=0;QUESTOES.forEach((q,i)=>{if(respostas[i]===q[2])acertos++});
   const ganho=acertos===10?3:1;
   estado.pacotes=(estado.pacotes||0)+ganho; estado.quizFeitos=(estado.quizFeitos||0)+1;
+  if(!Array.isArray(estado.simuladosRespondidos)) estado.simuladosRespondidos=[];
+  if(!estado.simuladosRespondidos.includes(simuladoAtual)) estado.simuladosRespondidos.push(simuladoAtual);
+  let mensagemRodada=`Este simulado foi bloqueado. Restam ${SIMULADOS.length-estado.simuladosRespondidos.length} simulado(s) nesta rodada.`;
+  if(estado.simuladosRespondidos.length>=SIMULADOS.length){
+    estado.simuladosRespondidos=[];
+    mensagemRodada="Você concluiu os 5 simulados. A rodada reiniciou e todos foram liberados novamente.";
+  }
   estado.historico.push({tipo:"simulado",nome:SIMULADOS[simuladoAtual].titulo,acertos,pacotes:ganho,data:new Date().toISOString()});
   salvar(); atualizarStatus();
-  document.getElementById("quizArea").innerHTML=`<div class="pergunta-box"><h2 style="color:#fff">${safe(SIMULADOS[simuladoAtual].titulo)}</h2><h2 style="color:#fff;margin-top:8px">Resultado: ${acertos}/10</h2><p style="color:#cbd5e1;margin-top:8px">Você ganhou <b style="color:#86efac">${ganho} pacote(s)</b>. Agora pode abrir pacote e colar as figurinhas manualmente no álbum.</p><button class="btn-dourado" style="margin-top:14px" onclick="document.getElementById('modalQuiz').classList.remove('ativo');abrirModalPacote();">Abrir pacotes</button><button class="quiz-opcao" style="margin-top:10px" onclick="renderQuizMenu()">Fazer outro simulado</button></div>`;
+  document.getElementById("quizArea").innerHTML=`<div class="pergunta-box"><h2 style="color:#fff">${safe(SIMULADOS[simuladoAtual].titulo)}</h2><h2 style="color:#fff;margin-top:8px">Resultado: ${acertos}/10</h2><p style="color:#cbd5e1;margin-top:8px">Você ganhou <b style="color:#86efac">${ganho} pacote(s)</b>. Agora pode abrir pacote e colar as figurinhas manualmente no álbum.</p><div class="quiz-status">${mensagemRodada}</div><button class="btn-dourado" style="margin-top:14px" onclick="document.getElementById('modalQuiz').classList.remove('ativo');abrirModalPacote();">Abrir pacotes</button><button class="quiz-opcao" style="margin-top:10px" onclick="renderQuizMenu()">Ver simulados restantes</button></div>`;
 }
 
 function resetarAlbum(){if(confirm("Apagar progresso deste navegador?")){localStorage.removeItem(STORAGE_KEY);localStorage.removeItem("pagina_dupla_exclusao_v4");estado=carregar();paginaAtual=1;renderLivro()}}
