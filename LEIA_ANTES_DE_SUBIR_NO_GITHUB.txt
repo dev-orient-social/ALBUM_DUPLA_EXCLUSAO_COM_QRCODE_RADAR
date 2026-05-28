@@ -1,0 +1,19 @@
+ALBUM DUPLA EXCLUSAO - VERSAO PRONTA
+
+Para criar um GitHub novo:
+1. Crie um repositorio novo.
+2. Envie TODOS os arquivos e pastas desta pasta para a raiz do repositorio.
+3. O arquivo index.html precisa ficar na raiz.
+4. As pastas audio, figurinhas e img precisam ficar junto do index.html.
+5. Ative o GitHub Pages em Settings > Pages > Branch main > root.
+
+Esta versao inclui:
+- index.html completo
+- 72 figurinhas
+- imagens de paginas/capa
+- logo da escola
+- audios do album
+- 5 simulados com 10 questoes cada
+- respostas mescladas entre A, B, C e D
+
+NAO suba zip dentro do repositorio. Extraia primeiro e suba os arquivos.
