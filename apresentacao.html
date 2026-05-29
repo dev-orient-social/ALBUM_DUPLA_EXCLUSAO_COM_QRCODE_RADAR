@@ -50,11 +50,33 @@
     p{color:#e5e7eb;font-size:1.05rem;margin-bottom:12px;text-align:justify}
     .bloco{background:rgba(255,255,255,.075);border:1px solid rgba(250,204,21,.32);border-radius:24px;padding:20px;box-shadow:0 10px 26px rgba(0,0,0,.28);margin:14px 0}
     .destaque{background:linear-gradient(135deg,rgba(124,58,237,.22),rgba(37,99,235,.18),rgba(22,163,74,.16));border:2px solid rgba(250,204,21,.58)}
-    .galeria{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:18px 0}
-    .galeria img{
-      width:100%;aspect-ratio:5/4;object-fit:cover;border-radius:18px;
-      border:3px solid rgba(250,204,21,.6);background:#111827;
+    .galeria{
+      display:grid;
+      grid-template-columns:repeat(4,1fr);
+      gap:12px;
+      margin:18px 0;
+    }
+    .galeria .foto{
+      width:100%;
+      height:180px;
+      border-radius:18px;
+      border:3px solid rgba(250,204,21,.6);
+      background:#0f172a;
       box-shadow:0 8px 18px rgba(0,0,0,.35);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      overflow:hidden;
+      padding:6px;
+    }
+    .galeria img{
+      width:100%;
+      height:100%;
+      object-fit:contain;
+      object-position:center;
+      display:block;
+      border-radius:12px;
+      background:#111827;
     }
     .duas-colunas{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:12px}
     .card{background:rgba(2,6,23,.66);border:1px solid rgba(250,204,21,.28);border-radius:20px;padding:16px}
@@ -69,12 +91,16 @@
     .btn{display:inline-block;margin-top:8px;background:#facc15;color:#111827;font-weight:900;padding:12px 18px;border-radius:999px;text-decoration:none}
     .rodape{text-align:center;color:#cbd5e1;font-size:.9rem;margin-top:18px;padding-top:12px;border-top:1px solid rgba(250,204,21,.28)}
     @media(max-width:760px){
-      .pagina{min-height:auto;padding:20px 12px}
-      .galeria{grid-template-columns:repeat(2,1fr)}
+      .pagina{min-height:auto;padding:20px 12px;justify-content:flex-start}
+      .galeria{grid-template-columns:1fr 1fr;gap:10px}
+      .galeria .foto{height:150px;padding:5px}
       .duas-colunas,.pessoas,.ficha,.qrbox{grid-template-columns:1fr}
       p{text-align:left;font-size:1rem}
       .bloco{padding:16px}
       .qrbox{text-align:center}
+    }
+    @media(max-width:420px){
+      .galeria .foto{height:135px}
     }
   </style>
 </head>
@@ -82,7 +108,7 @@
 
 <main class="pagina">
   <div class="cabecalho">
-    <img class="logo" src="https://dev-orient-social.github.io/ALBUM_DUPLA_EXCLUSAO_COM_QRCODE_RADAR/logo%20pedro%20de%20queiroz%20ferreira.jpg?v=20" onerror="this.style.display='none'" alt="Logotipo da Escola Pedro de Queiroz Ferreira">
+    <img class="logo" src="https://dev-orient-social.github.io/ALBUM_DUPLA_EXCLUSAO_COM_QRCODE_RADAR/logo%20pedro%20de%20queiroz%20ferreira.jpg?v=21" onerror="this.style.display='none'" alt="Logotipo da Escola Pedro de Queiroz Ferreira">
     <div class="selo">Feira de Ciências • Turma do 8º ano</div>
     <h1>Dupla Exclusão</h1>
     <p style="text-align:center;margin:0"><strong>Racismo e capacitismo na vida escolar</strong></p>
@@ -105,10 +131,10 @@
   </section>
 
   <div class="galeria">
-    <img src="https://dev-orient-social.github.io/ALBUM_DUPLA_EXCLUSAO_COM_QRCODE_RADAR/figurinhas/01.webp?v=20" alt="Figurinha 01">
-    <img src="https://dev-orient-social.github.io/ALBUM_DUPLA_EXCLUSAO_COM_QRCODE_RADAR/figurinhas/23.webp?v=20" alt="Figurinha 23">
-    <img src="https://dev-orient-social.github.io/ALBUM_DUPLA_EXCLUSAO_COM_QRCODE_RADAR/figurinhas/32.webp?v=20" alt="Figurinha 32">
-    <img src="https://dev-orient-social.github.io/ALBUM_DUPLA_EXCLUSAO_COM_QRCODE_RADAR/figurinhas/72.webp?v=20" alt="Figurinha 72">
+    <div class="foto"><img src="https://dev-orient-social.github.io/ALBUM_DUPLA_EXCLUSAO_COM_QRCODE_RADAR/figurinhas/01.webp?v=21" alt="Figurinha 01"></div>
+    <div class="foto"><img src="https://dev-orient-social.github.io/ALBUM_DUPLA_EXCLUSAO_COM_QRCODE_RADAR/figurinhas/23.webp?v=21" alt="Figurinha 23"></div>
+    <div class="foto"><img src="https://dev-orient-social.github.io/ALBUM_DUPLA_EXCLUSAO_COM_QRCODE_RADAR/figurinhas/32.webp?v=21" alt="Figurinha 32"></div>
+    <div class="foto"><img src="https://dev-orient-social.github.io/ALBUM_DUPLA_EXCLUSAO_COM_QRCODE_RADAR/figurinhas/72.webp?v=21" alt="Figurinha 72"></div>
   </div>
 
   <section class="bloco">
@@ -177,18 +203,9 @@
   <section class="bloco">
     <h2>Escola e idealizadores</h2>
     <div class="ficha">
-      <div>
-        <strong>Realização</strong>
-        Escola Pedro de Queiroz Ferreira
-      </div>
-      <div>
-        <strong>Idealização e coordenação pedagógica</strong>
-        Prof. Cleilson Paiva
-      </div>
-      <div>
-        <strong>Projeto digital e diagramação</strong>
-        Prof. Carlos Tavares
-      </div>
+      <div><strong>Realização</strong>Escola Pedro de Queiroz Ferreira</div>
+      <div><strong>Idealização e coordenação pedagógica</strong>Prof. Cleilson Paiva</div>
+      <div><strong>Projeto digital e diagramação</strong>Prof. Carlos Tavares</div>
     </div>
   </section>
 
@@ -200,7 +217,7 @@
       </p>
       <a class="btn" href="https://dev-orient-social.github.io/ALBUM_DUPLA_EXCLUSAO_COM_QRCODE_RADAR/">Abrir álbum digital</a>
     </div>
-    <img src="https://dev-orient-social.github.io/ALBUM_DUPLA_EXCLUSAO_COM_QRCODE_RADAR/qrcode_album_dupla_exclusao.png?v=20" onerror="this.style.display='none'" alt="QR Code do álbum digital">
+    <img src="https://dev-orient-social.github.io/ALBUM_DUPLA_EXCLUSAO_COM_QRCODE_RADAR/qrcode_album_dupla_exclusao.png?v=21" onerror="this.style.display='none'" alt="QR Code do álbum digital">
   </section>
 
   <div class="rodape">Página 2 de 2 — Projeto apresentado na Feira de Ciências</div>
