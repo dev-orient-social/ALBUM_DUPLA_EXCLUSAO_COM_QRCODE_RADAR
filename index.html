@@ -104,7 +104,7 @@ button{font-family:inherit;cursor:pointer}
 }
 .fig:hover{transform:translateY(-1px);border-color:var(--gold)}
 .arte{min-height:0;display:grid;place-items:center;position:relative;background:linear-gradient(145deg,#1f3b82,#0a1428);overflow:hidden}
-.arte img{width:100%;height:100%;object-fit:contain;display:block}
+.arte img{width:100%;height:100%;object-fit:contain;object-position:center;display:block;background:#fff}
 .placeholder{width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:6px;background:radial-gradient(circle,rgba(246,200,76,.2),transparent 42%),linear-gradient(145deg,#243f8c,#0d1a34)}
 .placeholder .num{font-size:1.75rem;font-weight:900;color:var(--gold)}.placeholder .tema{font-size:.55rem;color:#fff;font-weight:900;line-height:1.1;margin-top:4px}
 .estado{position:absolute;top:6px;right:6px;border-radius:999px;padding:3px 8px;background:#cbd5e1;color:#06142e;font-size:.56rem;font-weight:900;text-transform:uppercase}
@@ -217,23 +217,25 @@ button{font-family:inherit;cursor:pointer}
 @media(max-width:760px){
   html,body{height:auto;min-height:100%;overflow-x:hidden;overflow-y:auto}
   .app{min-height:100vh;height:auto;display:block;overflow:visible}
-  .topo{position:relative;align-items:flex-start;padding:8px 8px 10px;gap:7px}
-  .marca{min-width:165px;max-width:48%}.marca b{font-size:.86rem;line-height:1.05}.marca small{font-size:.58rem;line-height:1.15}
-  .topo nav{gap:5px;justify-content:flex-end}.topo button{padding:8px 9px;font-size:.64rem}
+  .topo{position:relative;display:block;padding:8px 8px 10px;gap:0}
+  .marca{min-width:0;max-width:none;width:100%;margin-bottom:8px;text-align:left}
+  .marca b{font-size:1rem;line-height:1.08}.marca small{font-size:.64rem;line-height:1.2}
+  .topo nav{width:100%;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;justify-content:stretch;align-items:stretch}
+  .topo button{width:100%;min-height:44px;padding:8px 5px;font-size:.70rem;line-height:1.05;text-align:center;border-radius:18px}
   .palco{height:auto;min-height:0;padding:7px;grid-template-columns:1fr;overflow:visible;display:block}
   .lateral{display:none}.area{height:auto;min-height:0;display:block;overflow:visible}
   .barra{padding:8px 10px;margin-bottom:8px}.barra b{font-size:.86rem}.barra span{font-size:.68rem}
   .livro,.livro.mobile-uma-pagina{display:block;height:auto;min-height:0;overflow:visible;filter:none}
   .livro .esquerda,.livro .miolo{display:none!important}
   .pagina{height:auto;min-height:0;margin:0;border-radius:18px!important;padding:7px;overflow:visible}
-  .creditos{display:none!important}
+  .creditos{display:block!important;position:static!important;left:auto;right:auto;bottom:auto;margin:8px 2px 0;padding:7px 8px;border-radius:12px;background:rgba(2,6,23,.72);border:1px solid rgba(246,200,76,.35);font-size:.58rem;line-height:1.25;text-align:center;color:#fff;text-shadow:0 2px 4px #000}
   .page-inner{height:auto;min-height:0;display:block;padding:6px 0 8px}
   .page-head{padding-left:42px;padding-right:2px;margin-bottom:6px}.page-head .label{font-size:.62rem;padding:3px 16px}.page-head small{font-size:.58rem;padding:3px 12px}.page-head h2{font-size:1rem;line-height:1.02;margin-top:2px}
   .texto-pagina{font-size:.64rem;line-height:1.18;padding:6px 7px;margin-bottom:8px}
   .grid-fig{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));grid-template-rows:none;gap:7px;min-height:0;overflow:visible}
-  .fig{min-height:0;height:178px;grid-template-rows:140px 38px;border-radius:14px;border-width:2px}
-  .arte{height:140px;min-height:0}.arte img{width:100%;height:100%;object-fit:cover;object-position:center;display:block}
-  .acao{height:38px;font-size:.62rem;line-height:1.05;padding:2px 4px}.placeholder .num{font-size:1.38rem}.placeholder .tema{font-size:.50rem}.estado{font-size:.54rem;padding:3px 7px;top:6px;right:6px}
+  .fig{min-height:0;height:190px;grid-template-rows:150px 40px;border-radius:14px;border-width:2px}
+  .arte{height:150px;min-height:0}.arte img{width:100%;height:100%;object-fit:contain;object-position:center;display:block;background:#fff}
+  .acao{height:40px;font-size:.60rem;line-height:1.05;padding:2px 4px}.placeholder .num{font-size:1.38rem}.placeholder .tema{font-size:.50rem}.estado{font-size:.54rem;padding:3px 7px;top:6px;right:6px}
   .pagina-especial{padding:8px 5px 18px;gap:8px}.pagina-especial h2{font-size:1.15rem}.pagina-especial p{font-size:.75rem}.info-grid{gap:6px}.info-card{padding:8px}.info-card span{font-size:1.05rem}.resultado{grid-template-columns:1fr}.ficha-rev{grid-template-columns:1fr}.card-modal{max-height:94vh;padding:14px}.ficha-img{height:300px}
 }
 
@@ -1110,12 +1112,46 @@ const ASSET_VERSION = "20260528-desafio-repetidas";
 const FIGS_POR_PACOTE = 5;
 const CREDITOS = 'Realização: <b>Escola Pedro de Queiroz Ferreira</b> • Idealização e coordenação pedagógica: <b>Prof. Cleilson Paiva</b> • Projeto gráfico e diagramação: <b>Prof. Carlos Tavares</b>';
 let audioAtivo = true, audioLiberado = false, audio = {};
+function criarAudio(lista){
+  let pos=0;
+  const a=new Audio(lista[0]);
+  a.preload="auto";
+  a.addEventListener("error",()=>{
+    pos++;
+    if(pos<lista.length){
+      a.src=lista[pos];
+      try{a.load()}catch(e){}
+    }
+  });
+  return a;
+}
 function setupAudio(){
-  audio.bg = new Audio(`audio/album/bg-adventure.mp3?v=${ASSET_VERSION}`);
-  audio.pack = new Audio(`audio/album/pack-open.mp3?v=${ASSET_VERSION}`);
-  audio.page = new Audio(`audio/album/page-turn.mp3?v=${ASSET_VERSION}`);
-  audio.click = new Audio(`audio/album/click.mp3?v=${ASSET_VERSION}`);
-  audio.sticker = new Audio(`audio/album/sticker-place.mp3?v=${ASSET_VERSION}`);
+  audio.bg = criarAudio([
+    `audio/album/bg-adventure.mp3?v=${ASSET_VERSION}`,
+    `audio/album/fundo.mp3?v=${ASSET_VERSION}`,
+    `audio/album/Apex_Ascendancy.mp3?v=${ASSET_VERSION}`,
+    `audio/album/CE_Anthem.mp3?v=${ASSET_VERSION}`,
+    `audio/bg-adventure.mp3?v=${ASSET_VERSION}`,
+    `audio/fundo.mp3?v=${ASSET_VERSION}`
+  ]);
+  audio.pack = criarAudio([
+    `audio/album/pack-open.mp3?v=${ASSET_VERSION}`,
+    `audio/pack-open.mp3?v=${ASSET_VERSION}`
+  ]);
+  audio.page = criarAudio([
+    `audio/album/page-turn.mp3?v=${ASSET_VERSION}`,
+    `audio/page-turn.mp3?v=${ASSET_VERSION}`
+  ]);
+  audio.click = criarAudio([
+    `audio/album/click.mp3?v=${ASSET_VERSION}`,
+    `audio/album/acerto.mp3?v=${ASSET_VERSION}`,
+    `audio/click.mp3?v=${ASSET_VERSION}`
+  ]);
+  audio.sticker = criarAudio([
+    `audio/album/sticker-place.mp3?v=${ASSET_VERSION}`,
+    `audio/album/sticker_place.mp3?v=${ASSET_VERSION}`,
+    `audio/sticker-place.mp3?v=${ASSET_VERSION}`
+  ]);
   Object.values(audio).forEach(a=>{a.preload="auto"});
   audio.bg.loop = true; audio.bg.volume=.16; audio.pack.volume=.55; audio.page.volume=.55; audio.click.volume=.45; audio.sticker.volume=.55;
   atualizarBotaoAudio();
@@ -1162,7 +1198,14 @@ function safe(t){return String(t??"").replace(/[&<>"']/g,s=>({"&":"&amp;","<":"&
 function pad(n){return String(n).padStart(2,"0")}
 function caminhosImagem(num){
   const n2=pad(num);
-  return [`figurinhas/${n2}.webp?v=${ASSET_VERSION}`];
+  return [
+    `figurinhas/${n2}.webp?v=${ASSET_VERSION}`,
+    `figurinhas/${n2}.webp`,
+    `figurinhas/figurinha-${n2}.webp?v=${ASSET_VERSION}`,
+    `figurinhas/figurinha-${n2}.webp`,
+    `figurinhas/${Number(num)}.webp?v=${ASSET_VERSION}`,
+    `figurinhas/${Number(num)}.webp`
+  ];
 }
 function imgFallback(el){
   const lista = JSON.parse(el.dataset.fallback || "[]");
