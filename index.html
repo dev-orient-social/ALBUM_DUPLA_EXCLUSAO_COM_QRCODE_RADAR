@@ -294,6 +294,8 @@ button{font-family:inherit;cursor:pointer}
     <button id="btnCapa">Capa</button>
     <button id="btnSimulado">Simulado</button>
     <button id="btnPacotes">Pacotes: <span id="pacotesTopo">3</span></button>
+    <button id="btnRepetidasTopo">Repetidas: <span id="repetidasTopo">0</span></button>
+    <button id="btnReiniciarTopo">Reiniciar</button>
     <button id="btnAnteriorTopo">← Página</button>
     <button id="btnProximaTopo">Página →</button>
     <button id="btnAudio">Som: ON</button>
@@ -311,11 +313,12 @@ button{font-family:inherit;cursor:pointer}
       <div><b id="totalColadas">0</b><span>coladas</span></div>
       <div><b id="totalDisponiveis">0</b><span>para colar</span></div>
       <div><b id="totalPacotes">3</b><span>pacotes</span></div>
-      <div><b>5</b><span>figs/pacote</span></div>
+      <div><b id="totalRepetidas">0</b><span>repetidas</span></div>
     </div>
     <div class="controles">
       <button id="btnAnterior">← Página</button>
       <button id="btnProxima">Página →</button>
+      <button id="btnReiniciarLateral">Reiniciar álbum</button>
     </div>
     <div class="box dica">
       <b>Como usar</b>
@@ -355,7 +358,7 @@ button{font-family:inherit;cursor:pointer}
         <input id="inputCodigoBrinde" type="text" inputmode="numeric" placeholder="Digite o código">
         <button class="btn-dourado" id="btnResgatarCodigo" type="button">Resgatar</button>
       </div>
-      <small>Código especial <b>2805</b>: libera 40 figurinhas para colar no álbum. Uso único neste navegador.</small>
+      <small>Campo reservado para código autorizado do professor.</small>
     </div>
 
     <div id="resultadoPacote" class="resultado"></div>
@@ -1103,7 +1106,7 @@ const FIGURINHAS = [
   }
 ];
 const STORAGE_KEY = "album_dupla_exclusao_v4_72";
-const ASSET_VERSION = "20260528-fix2332";
+const ASSET_VERSION = "20260528-desafio-repetidas";
 const FIGS_POR_PACOTE = 5;
 const CREDITOS = 'Realização: <b>Escola Pedro de Queiroz Ferreira</b> • Idealização e coordenação pedagógica: <b>Prof. Cleilson Paiva</b> • Projeto gráfico e diagramação: <b>Prof. Carlos Tavares</b>';
 let audioAtivo = true, audioLiberado = false, audio = {};
@@ -1135,7 +1138,7 @@ function alternarAudio(){
 }
 document.addEventListener("click", liberarAudio, {once:true});
 
-function estadoInicial(){return {album:{}, pacotes:3, historico:[], quizFeitos:0, codigosResgatados:{}, simuladosRespondidos:[]}}
+function estadoInicial(){return {album:{}, pacotes:3, historico:[], quizFeitos:0, codigosResgatados:{}, simuladosRespondidos:[], desafio40Concluido:false, albumCompletoAvisado:false}}
 function carregar(){
   try{
     const salvo=JSON.parse(localStorage.getItem(STORAGE_KEY));
@@ -1145,7 +1148,9 @@ function carregar(){
       album:(salvo&&salvo.album)||{},
       historico:(salvo&&salvo.historico)||[],
       codigosResgatados:(salvo&&salvo.codigosResgatados)||{},
-      simuladosRespondidos:Array.isArray(salvo&&salvo.simuladosRespondidos)?salvo.simuladosRespondidos:[]
+      simuladosRespondidos:Array.isArray(salvo&&salvo.simuladosRespondidos)?salvo.simuladosRespondidos:[],
+      desafio40Concluido:!!(salvo&&salvo.desafio40Concluido),
+      albumCompletoAvisado:!!(salvo&&salvo.albumCompletoAvisado)
     };
   }catch(e){return estadoInicial()}
 }
@@ -1172,11 +1177,14 @@ function imagemHTML(fig){
 }
 function totais(){
   const regs=Object.values(estado.album);
-  return {
-    coladas: regs.filter(r=>r.colada).length,
-    disp: regs.reduce((s,r)=>s + (!r.colada ? Number(r.quantidade||0) : 0),0),
-    pacotes: estado.pacotes||0
-  };
+  const coladas=regs.filter(r=>r.colada).length;
+  const disp=regs.reduce((s,r)=>s + (!r.colada ? Number(r.quantidade||0) : 0),0);
+  const repetidas=regs.reduce((s,r)=>{
+    const q=Number(r.quantidade||0);
+    if(r.colada) return s+q;
+    return s+Math.max(0,q-1);
+  },0);
+  return {coladas, disp, repetidas, pacotes: estado.pacotes||0};
 }
 function temaTexto(tema){
   const mapa={
@@ -1286,6 +1294,14 @@ function atualizarStatus(){
   document.getElementById("totalDisponiveis").textContent=t.disp;
   document.getElementById("totalPacotes").textContent=t.pacotes;
   document.getElementById("pacotesTopo").textContent=t.pacotes;
+  document.getElementById("totalRepetidas").textContent=t.repetidas;
+  document.getElementById("repetidasTopo").textContent=t.repetidas;
+  if(t.coladas>=72 && !estado.albumCompletoAvisado){
+    estado.albumCompletoAvisado=true; salvar();
+    setTimeout(()=>{
+      if(confirm("Parabéns! Álbum completo. Deseja reiniciar o álbum para uma nova rodada?")){resetarAlbum(true)}
+    },350);
+  }
 }
 function proxima(){if(paginaAtual<totalPaginas()){paginaAtual=isMobile()?paginaAtual+1:(paginaAtual===1?2:par(paginaAtual)+2);playSom("page");renderLivro()}}
 function anterior(){if(paginaAtual>1){paginaAtual=isMobile()?paginaAtual-1:(paginaAtual<=2?1:par(paginaAtual)-2);playSom("page");renderLivro()}}
@@ -1376,7 +1392,7 @@ function resgatarCodigoBrinde(){
   salvar(); playSom("pack");
 
   document.getElementById("resultadoPacote").innerHTML=novas.map(f=>card(f,true)).join("");
-  document.getElementById("avisoPacote").innerHTML=`🎁 Código <b style="color:#86efac">2805</b> resgatado com sucesso. Você ganhou <b style="color:#86efac">40 figurinhas</b> para colar manualmente no álbum.`;
+  document.getElementById("avisoPacote").innerHTML=`🎁 Código resgatado com sucesso. Você ganhou <b style="color:#86efac">40 figurinhas</b> para colar manualmente no álbum.`;
   if(input) input.value="";
   renderLivro();
 }
@@ -1458,6 +1474,25 @@ const SIMULADOS=[
   }
 ];
 
+const DESAFIO_40={
+  titulo:"Desafio Final — Mestre da Inclusão",
+  questoes:[
+    ["Quando racismo e capacitismo atingem o mesmo estudante, o nome mais adequado para essa situação é:",["Dupla exclusão","Avaliação comum","Atividade lúdica","Convivência neutra"],0],
+    ["Qual atitude demonstra acessibilidade real, e não apenas aparência de inclusão?",["Colocar cartaz bonito sem adaptação","Ouvir o estudante, adaptar recursos e garantir participação","Separar estudantes com deficiência","Evitar conversar sobre racismo"],1],
+    ["Em uma escola antirracista, a representatividade deve aparecer:",["Só em datas comemorativas","Apenas em cartazes","No currículo, nas imagens, nas falas e nas oportunidades","Somente no recreio"],2],
+    ["Capacitismo acontece quando a escola:",["Garante Libras e materiais acessíveis","Trata a deficiência como incapacidade ou pena","Adapta avaliações quando necessário","Respeita diferentes formas de aprender"],1],
+    ["Uma barreira atitudinal é:",["Escada sem rampa","Material sem contraste","Preconceito, piada ou baixa expectativa sobre o aluno","Falta de internet"],2],
+    ["Qual resposta é mais correta diante de uma denúncia de discriminação?",["Tratar como brincadeira","Culpar a vítima","Ignorar para evitar conflito","Acolher, registrar, orientar e agir com responsabilidade"],3],
+    ["Inclusão escolar significa:",["Aluno presente fisicamente, mas sem participar","Pertencimento, aprendizagem, acessibilidade e respeito","Apenas matrícula feita","Separar atividades para evitar dificuldade"],1],
+    ["Uma prática que combate o racismo estrutural é:",["Fingir que todos vivem as mesmas oportunidades","Valorizar histórias, culturas e direitos de grupos historicamente excluídos","Proibir debates sobre desigualdade","Dizer que preconceito não existe"],1],
+    ["Quando um aluno surdo não tem intérprete, Libras ou recurso visual, há falta de:",["Acessibilidade comunicacional","Competição escolar","Uniforme adequado","Decoração da sala"],0],
+    ["O papel da comunidade escolar no combate à dupla exclusão é:",["Responsabilidade coletiva, contínua e educativa","Responsabilidade apenas da família","Responsabilidade apenas do aluno","Não existe responsabilidade"],0],
+    ["Qual frase representa melhor a empatia na escola?",["Cada estudante deve se virar sozinho","Todos aprendem igual","Escutar necessidades e remover barreiras é parte do direito de aprender","Adaptação é privilégio"],2],
+    ["Para conquistar uma escola inclusiva, o melhor caminho é:",["Silenciar diferenças","Manter barreiras para evitar trabalho","Planejar, adaptar, respeitar e avaliar continuamente","Separar quem aprende diferente"],2]
+  ]
+};
+let modoDesafio40=false;
+
 let simuladoAtual=0;
 let respostas={};
 
@@ -1495,18 +1530,28 @@ function renderQuizMenu(){
         const label=bloqueado?" — respondido nesta rodada":"";
         return `<button class="quiz-opcao ${bloqueado?'bloqueado':''}" ${bloqueado?'disabled':''} onclick="iniciarSimulado(${i})">${i+1}. ${safe(s.titulo)}${label}</button>`
       }).join("")}
+      <div class="quiz-status"><b>Desafio difícil:</b> 12 questões especiais. Só libera 40 figurinhas se gabaritar. ${estado.desafio40Concluido?'Recompensa já usada neste navegador.':''}</div>
+      <button class="btn-dourado" style="margin-top:12px" onclick="iniciarDesafio40()" ${estado.desafio40Concluido?'disabled style="opacity:.55;margin-top:12px"':''}>Iniciar desafio das 40 figurinhas</button>
     </div>`;
 }
 
 window.iniciarSimulado=function(i){
+  modoDesafio40=false;
   if(simuladoBloqueado(i)){alert("Este simulado já foi respondido nesta rodada. Escolha um dos simulados restantes.");renderQuizMenu();return}
   simuladoAtual=i;
   respostas={};
   renderQuiz();
 }
 
+window.iniciarDesafio40=function(){
+  if(estado.desafio40Concluido){alert("O desafio das 40 figurinhas já foi concluído neste navegador.");return}
+  modoDesafio40=true;
+  respostas={};
+  renderQuiz();
+}
+
 function questoesAtuais(){
-  return SIMULADOS[simuladoAtual].questoes;
+  return modoDesafio40 ? DESAFIO_40.questoes : SIMULADOS[simuladoAtual].questoes;
 }
 
 function renderQuiz(){
@@ -1514,8 +1559,8 @@ function renderQuiz(){
   const QUESTOES=questoesAtuais();
   area.innerHTML=`
     <div class="pergunta-box" style="margin-bottom:10px">
-      <h2 style="color:#fff">${safe(SIMULADOS[simuladoAtual].titulo)}</h2>
-      <p style="color:#cbd5e1;margin-top:8px">Responda as 10 questões. Gabaritou: 3 pacotes. Até 9 acertos: 1 pacote.</p>
+      <h2 style="color:#fff">${safe(modoDesafio40 ? DESAFIO_40.titulo : SIMULADOS[simuladoAtual].titulo)}</h2>
+      <p style="color:#cbd5e1;margin-top:8px">${modoDesafio40 ? "Desafio difícil: responda 12 questões e gabarite para liberar 40 figurinhas." : "Responda as 10 questões. Gabaritou: 3 pacotes. Até 9 acertos: 1 pacote."}</p>
       <button class="quiz-opcao" onclick="renderQuizMenu()">← Escolher outro simulado</button>
     </div>
   `+
@@ -1527,7 +1572,29 @@ window.marcarResposta=function(i,j){respostas[i]=j;renderQuiz()}
 
 window.finalizarQuiz=function(){
   const QUESTOES=questoesAtuais();
-  if(Object.keys(respostas).length<QUESTOES.length){alert("Responda todas as 10 questões.");return}
+  if(Object.keys(respostas).length<QUESTOES.length){alert(`Responda todas as ${QUESTOES.length} questões.`);return}
+
+  if(modoDesafio40){
+    if(estado.desafio40Concluido){alert("O desafio das 40 figurinhas já foi concluído neste navegador.");renderQuizMenu();return}
+    let acertos=0; QUESTOES.forEach((q,i)=>{if(respostas[i]===q[2])acertos++});
+    if(acertos===QUESTOES.length){
+      const qtd=40;
+      const novas=sortearFigurinhasBrinde(qtd);
+      estado.desafio40Concluido=true;
+      estado.historico.push({tipo:"desafio40",acertos,qtd,data:new Date().toISOString()});
+      salvar(); atualizarStatus(); playSom("pack");
+      document.getElementById("quizArea").innerHTML=`<div class="pergunta-box"><h2 style="color:#fff">${safe(DESAFIO_40.titulo)}</h2><h2 style="color:#fff;margin-top:8px">Resultado: ${acertos}/${QUESTOES.length}</h2><p style="color:#cbd5e1;margin-top:8px">Parabéns! Você gabaritou o desafio e ganhou <b style="color:#86efac">40 figurinhas</b>.</p><button class="btn-dourado" style="margin-top:14px" onclick="document.getElementById('modalQuiz').classList.remove('ativo');abrirModalPacote();">Ver figurinhas</button><button class="quiz-opcao" style="margin-top:10px" onclick="renderQuizMenu()">Voltar aos simulados</button></div>`;
+      document.getElementById("resultadoPacote").innerHTML=novas.map(f=>card(f,true)).join("");
+      document.getElementById("avisoPacote").innerHTML=`Desafio concluído. As 40 figurinhas foram adicionadas à coleção.`;
+      renderLivro();
+    }else{
+      estado.historico.push({tipo:"desafio40_tentativa",acertos,data:new Date().toISOString()});
+      salvar();
+      document.getElementById("quizArea").innerHTML=`<div class="pergunta-box"><h2 style="color:#fff">${safe(DESAFIO_40.titulo)}</h2><h2 style="color:#fff;margin-top:8px">Resultado: ${acertos}/${QUESTOES.length}</h2><p style="color:#cbd5e1;margin-top:8px">O desafio só libera as 40 figurinhas com <b style="color:#facc15">12 acertos</b>. Estude o tema e tente novamente.</p><button class="btn-dourado" style="margin-top:14px" onclick="iniciarDesafio40()">Tentar novamente</button><button class="quiz-opcao" style="margin-top:10px" onclick="renderQuizMenu()">Voltar aos simulados</button></div>`;
+    }
+    return;
+  }
+
   if(simuladoBloqueado(simuladoAtual)){alert("Este simulado já foi respondido nesta rodada.");renderQuizMenu();return}
   let acertos=0;QUESTOES.forEach((q,i)=>{if(respostas[i]===q[2])acertos++});
   const ganho=acertos===10?3:1;
@@ -1544,11 +1611,14 @@ window.finalizarQuiz=function(){
   document.getElementById("quizArea").innerHTML=`<div class="pergunta-box"><h2 style="color:#fff">${safe(SIMULADOS[simuladoAtual].titulo)}</h2><h2 style="color:#fff;margin-top:8px">Resultado: ${acertos}/10</h2><p style="color:#cbd5e1;margin-top:8px">Você ganhou <b style="color:#86efac">${ganho} pacote(s)</b>. Agora pode abrir pacote e colar as figurinhas manualmente no álbum.</p><div class="quiz-status">${mensagemRodada}</div><button class="btn-dourado" style="margin-top:14px" onclick="document.getElementById('modalQuiz').classList.remove('ativo');abrirModalPacote();">Abrir pacotes</button><button class="quiz-opcao" style="margin-top:10px" onclick="renderQuizMenu()">Ver simulados restantes</button></div>`;
 }
 
-function resetarAlbum(){if(confirm("Apagar progresso deste navegador?")){localStorage.removeItem(STORAGE_KEY);localStorage.removeItem("pagina_dupla_exclusao_v4");estado=carregar();paginaAtual=1;renderLivro()}}
+function resetarAlbum(forcar=false){if(forcar || confirm("Tem certeza que deseja reiniciar o álbum? Todo o progresso deste navegador será apagado.")){localStorage.removeItem(STORAGE_KEY);localStorage.removeItem("pagina_dupla_exclusao_v4");estado=carregar();paginaAtual=1;salvar();renderLivro();alert("Álbum reiniciado.")}}
 ["btnAnterior","btnAnteriorTopo"].forEach(id=>document.getElementById(id).onclick=anterior);
 ["btnProxima","btnProximaTopo"].forEach(id=>document.getElementById(id).onclick=proxima);
 document.getElementById("btnCapa").onclick=()=>{paginaAtual=1;playSom("page");renderLivro()};
 document.getElementById("btnAudio").onclick=alternarAudio;
+document.getElementById("btnReiniciarTopo").onclick=()=>resetarAlbum(false);
+document.getElementById("btnReiniciarLateral").onclick=()=>resetarAlbum(false);
+document.getElementById("btnRepetidasTopo").onclick=()=>alert(`Você tem ${totais().repetidas} figurinha(s) repetida(s).`);
 ["btnPacotes","btnAbrirLateral","btnAbrirTopo"].forEach(id=>document.getElementById(id).onclick=abrirModalPacote);
 document.getElementById("btnAbrirPacote").onclick=abrirPacote;
 document.getElementById("btnResgatarCodigo").onclick=resgatarCodigoBrinde;
