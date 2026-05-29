@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dupla Exclusão — Texto de Apresentação</title>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{
+      font-family:Arial, Helvetica, sans-serif;
+      background:#07111f;
+      color:#f8fafc;
+      line-height:1.65;
+    }
+    .pagina{
+      width:min(980px,100%);
+      min-height:100vh;
+      margin:0 auto;
+      padding:28px 18px;
+      display:flex;
+      flex-direction:column;
+      justify-content:center;
+      border-bottom:4px solid rgba(250,204,21,.55);
+      background:
+        radial-gradient(circle at 15% 10%,rgba(250,204,21,.12),transparent 28%),
+        radial-gradient(circle at 85% 18%,rgba(37,99,235,.14),transparent 32%),
+        linear-gradient(145deg,#07142e,#111827,#2f1608);
+    }
+    .cabecalho{
+      text-align:center;
+      margin-bottom:22px;
+      padding:18px;
+      border-radius:26px;
+      border:2px solid rgba(250,204,21,.55);
+      background:rgba(2,6,23,.62);
+      box-shadow:0 12px 36px rgba(0,0,0,.35);
+    }
+    .logo{
+      width:92px;
+      height:92px;
+      object-fit:cover;
+      border-radius:50%;
+      border:4px solid #facc15;
+      background:#fff;
+      display:block;
+      margin:0 auto 12px;
+    }
+    .selo{
+      display:inline-block;
+      background:linear-gradient(135deg,#facc15,#fde68a);
+      color:#111827;
+      font-weight:900;
+      padding:7px 14px;
+      border-radius:999px;
+      font-size:.78rem;
+      text-transform:uppercase;
+      margin-bottom:10px;
+    }
+    h1{
+      color:#facc15;
+      text-transform:uppercase;
+      font-size:clamp(2rem,7vw,4.4rem);
+      line-height:.95;
+      text-shadow:0 4px 12px #000;
+      margin-bottom:8px;
+    }
+    h2{
+      color:#facc15;
+      text-transform:uppercase;
+      font-size:clamp(1.45rem,5vw,2.45rem);
+      line-height:1.05;
+      margin:0 0 14px;
+      text-shadow:0 3px 10px rgba(0,0,0,.48);
+    }
+    h3{
+      color:#fde68a;
+      font-size:1.18rem;
+      margin-bottom:8px;
+    }
+    p{
+      color:#e5e7eb;
+      font-size:1.05rem;
+      margin-bottom:12px;
+      text-align:justify;
+    }
+    .bloco{
+      background:rgba(255,255,255,.075);
+      border:1px solid rgba(250,204,21,.32);
+      border-radius:24px;
+      padding:20px;
+      box-shadow:0 10px 26px rgba(0,0,0,.28);
+      margin:14px 0;
+    }
+    .destaque{
+      background:linear-gradient(135deg,rgba(124,58,237,.22),rgba(37,99,235,.18),rgba(22,163,74,.16));
+      border:2px solid rgba(250,204,21,.58);
+    }
+    .galeria{
+      display:grid;
+      grid-template-columns:repeat(4,1fr);
+      gap:12px;
+      margin:18px 0;
+    }
+    .galeria img{
+      width:100%;
+      aspect-ratio:5/4;
+      object-fit:cover;
+      border-radius:18px;
+      border:3px solid rgba(250,204,21,.6);
+      background:#111827;
+      box-shadow:0 8px 18px rgba(0,0,0,.35);
+    }
+    .duas-colunas{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:16px;
+      margin-top:12px;
+    }
+    .card{
+      background:rgba(2,6,23,.66);
+      border:1px solid rgba(250,204,21,.28);
+      border-radius:20px;
+      padding:16px;
+    }
+    .card b{color:#facc15}
+    .pessoas{
+      display:grid;
+      grid-template-columns:repeat(2,1fr);
+      gap:14px;
+      margin-top:14px;
+    }
+    .nome{
+      background:linear-gradient(135deg,#7c3aed,#2563eb,#16a34a);
+      border-radius:18px;
+      padding:14px;
+      text-align:center;
+      font-weight:900;
+      color:#fff;
+      box-shadow:0 8px 18px rgba(0,0,0,.28);
+    }
+    .ficha{
+      display:grid;
+      grid-template-columns:repeat(3,1fr);
+      gap:14px;
+      margin-top:14px;
+    }
+    .ficha div{
+      background:rgba(250,204,21,.12);
+      border:1px solid rgba(250,204,21,.32);
+      border-radius:18px;
+      padding:14px;
+      text-align:center;
+      color:#fff;
+    }
+    .ficha strong{
+      display:block;
+      color:#facc15;
+      text-transform:uppercase;
+      font-size:.78rem;
+      margin-bottom:5px;
+    }
+    .qrbox{
+      display:grid;
+      grid-template-columns:1fr 210px;
+      gap:18px;
+      align-items:center;
+      margin-top:14px;
+    }
+    .qrbox img{
+      width:210px;
+      height:210px;
+      padding:10px;
+      background:#fff;
+      border-radius:18px;
+      margin:auto;
+    }
+    .btn{
+      display:inline-block;
+      margin-top:8px;
+      background:#facc15;
+      color:#111827;
+      font-weight:900;
+      padding:12px 18px;
+      border-radius:999px;
+      text-decoration:none;
+    }
+    .rodape{
+      text-align:center;
+      color:#cbd5e1;
+      font-size:.9rem;
+      margin-top:18px;
+      padding-top:12px;
+      border-top:1px solid rgba(250,204,21,.28);
+    }
+    @media(max-width:760px){
+      .pagina{min-height:auto;padding:20px 12px}
+      .galeria{grid-template-columns:repeat(2,1fr)}
+      .duas-colunas,.pessoas,.ficha,.qrbox{grid-template-columns:1fr}
+      p{text-align:left;font-size:1rem}
+      .bloco{padding:16px}
+      .qrbox{text-align:center}
+    }
+  </style>
+</head>
+<body>
+
+<main class="pagina">
+  <div class="cabecalho">
+    <img class="logo" src="logo pedro de queiroz ferreira.jpg" onerror="this.style.display='none'" alt="Logotipo da Escola Pedro de Queiroz Ferreira">
+    <div class="selo">Feira de Ciências • Turma do 8º ano</div>
+    <h1>Dupla Exclusão</h1>
+    <p style="text-align:center;margin:0"><strong>Racismo e capacitismo na vida escolar</strong></p>
+  </div>
+
+  <section class="bloco destaque">
+    <h2>Apresentação do tema</h2>
+    <p>
+      O tema <strong>Dupla Exclusão</strong> chama atenção para uma realidade que muitas vezes passa despercebida dentro e fora da escola:
+      existem estudantes que não enfrentam apenas uma forma de preconceito, mas várias barreiras ao mesmo tempo. Quando um estudante
+      negro com deficiência sofre racismo e também capacitismo, ele pode ser excluído de maneira dupla: pela cor da pele, pela deficiência,
+      pela falta de acessibilidade, pela ausência de escuta e pela baixa expectativa que algumas pessoas colocam sobre sua capacidade de aprender.
+    </p>
+    <p>
+      O racismo aparece quando pessoas negras são tratadas com inferioridade, quando suas histórias são apagadas, quando sua presença é
+      desvalorizada ou quando são vistas por meio de estereótipos. O capacitismo acontece quando pessoas com deficiência são consideradas
+      incapazes, dependentes ou impedidas de participar plenamente das atividades escolares e sociais. Quando essas duas formas de discriminação
+      se encontram, a exclusão se torna ainda mais forte e mais difícil de ser percebida.
+    </p>
+  </section>
+
+  <div class="galeria">
+    <img src="figurinhas/01.webp" alt="Figurinha 01">
+    <img src="figurinhas/23.webp" alt="Figurinha 23">
+    <img src="figurinhas/32.webp" alt="Figurinha 32">
+    <img src="figurinhas/72.webp" alt="Figurinha 72">
+  </div>
+
+  <section class="bloco">
+    <h2>Por que falar disso na escola?</h2>
+    <p>
+      A escola é um espaço de aprendizagem, convivência e formação humana. Por isso, ela precisa ser um lugar onde todos os estudantes
+      se sintam respeitados, representados e pertencentes. Falar sobre dupla exclusão é reconhecer que a inclusão não pode ser apenas uma
+      palavra bonita em documentos ou discursos. Ela precisa aparecer nas atitudes, nos materiais, nas atividades, na comunicação, na
+      acessibilidade, nas relações entre colegas e na forma como professores, gestão, família e comunidade acompanham cada estudante.
+    </p>
+    <p>
+      Quando uma escola discute racismo e capacitismo, ela ajuda os alunos a perceberem que apelidos ofensivos, isolamento, piadas,
+      falta de adaptação, ausência de Libras, inacessibilidade física, invisibilidade de pessoas negras e baixa expectativa sobre estudantes
+      com deficiência não são fatos normais. São barreiras que precisam ser combatidas com consciência, respeito e ação coletiva.
+    </p>
+  </section>
+
+  <div class="rodape">Página 1 de 2 — Projeto Álbum Digital Dupla Exclusão</div>
+</main>
+
+<main class="pagina">
+  <section class="bloco destaque">
+    <h2>O álbum como ferramenta educativa</h2>
+    <p>
+      Para apresentar esse tema de forma mais atrativa, o projeto utiliza um <strong>álbum impresso</strong> e um <strong>álbum digital interativo</strong>.
+      As figurinhas representam situações, direitos, atitudes e desafios relacionados ao racismo, ao capacitismo, à acessibilidade e à inclusão.
+      No álbum digital, o visitante acessa pelo QR Code, abre pacotes de figurinhas, cola as imagens no álbum, responde simulados e desbloqueia
+      explicações sobre cada tema.
+    </p>
+    <p>
+      Essa proposta transforma o conteúdo em uma experiência prática. O aluno não apenas lê sobre inclusão: ele interage, observa imagens,
+      responde perguntas, recebe recompensas e reflete sobre situações reais que podem acontecer no ambiente escolar. O objetivo é despertar
+      consciência, empatia e responsabilidade. Combater a dupla exclusão não é tarefa de uma pessoa só. É compromisso de toda a comunidade escolar.
+    </p>
+  </section>
+
+  <div class="duas-colunas">
+    <div class="card">
+      <h3>O que o projeto ensina?</h3>
+      <p>
+        Ensina que a escola inclusiva precisa garantir acessibilidade, respeito, participação, representatividade e pertencimento.
+        Também mostra que racismo e capacitismo devem ser identificados e enfrentados como problemas sérios de discriminação.
+      </p>
+    </div>
+    <div class="card">
+      <h3>O que o visitante faz?</h3>
+      <p>
+        O visitante conhece o tema, observa as imagens, acessa o álbum pelo celular, participa dos simulados e compreende como pequenas
+        atitudes podem tornar a escola mais justa, acolhedora e humana.
+      </p>
+    </div>
+  </div>
+
+  <section class="bloco">
+    <h2>Alunos apresentadores</h2>
+    <p>
+      A apresentação do trabalho valoriza o protagonismo dos estudantes do 8º ano, que explicam o tema, mostram o álbum impresso,
+      orientam o acesso ao álbum digital e ajudam os visitantes a compreenderem a importância da inclusão na escola.
+    </p>
+    <div class="pessoas">
+      <div class="nome">Antônio Vitor Anselmo Carvalho</div>
+      <div class="nome">Gabrielly Rodrigues Oliveira</div>
+    </div>
+  </section>
+
+  <section class="bloco">
+    <h2>Escola e idealizadores</h2>
+    <div class="ficha">
+      <div>
+        <strong>Realização</strong>
+        Escola Pedro de Queiroz Ferreira
+      </div>
+      <div>
+        <strong>Idealização e coordenação pedagógica</strong>
+        Prof. Cleilson Paiva
+      </div>
+      <div>
+        <strong>Projeto digital e diagramação</strong>
+        Prof. Carlos Tavares
+      </div>
+    </div>
+  </section>
+
+  <section class="bloco qrbox">
+    <div>
+      <h2>Acesse o álbum digital</h2>
+      <p>
+        Aponte a câmera do celular para o QR Code do álbum e participe da experiência interativa com figurinhas, simulados e fichas explicativas.
+      </p>
+      <a class="btn" href="https://dev-orient-social.github.io/ALBUM_DUPLA_EXCLUSAO_COM_QRCODE_RADAR/">Abrir álbum digital</a>
+    </div>
+    <img src="qrcode_album_dupla_exclusao.png" onerror="this.style.display='none'" alt="QR Code do álbum digital">
+  </section>
+
+  <div class="rodape">Página 2 de 2 — Projeto apresentado na Feira de Ciências</div>
+</main>
+
+</body>
+</html>
