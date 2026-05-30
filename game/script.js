@@ -200,6 +200,7 @@ const porcentagemVisivelEl = document.getElementById("porcentagemVisivel");
 const modal = document.getElementById("modal");
 const modalTitulo = document.getElementById("modalTitulo");
 const modalTexto = document.getElementById("modalTexto");
+const modalPremio = document.getElementById("modalPremio");
 const btnModalPrincipal = document.getElementById("btnModalPrincipal");
 const btnModalSecundario = document.getElementById("btnModalSecundario");
 const audioFundo = document.getElementById("audioFundo");
@@ -1159,6 +1160,32 @@ function liberarFigurinhaNoAlbum(motivo) {
   return numero;
 }
 
+function caminhoFigurinhaPremio(numero) {
+  const n2 = String(numero).padStart(2, "0");
+  return `../figurinhas/${n2}.webp`;
+}
+
+function fallbackFigurinhaPremio(img, numero) {
+  const n2 = String(numero).padStart(2, "0");
+  if (!img.dataset.tentouAntigo) {
+    img.dataset.tentouAntigo = "1";
+    img.src = `../figurinhas/figurinha-${n2}.webp`;
+    return;
+  }
+  img.style.display = "none";
+}
+
+function htmlPremioGame(numero) {
+  if (!numero) return "";
+  const n2 = String(numero).padStart(2, "0");
+  return `
+    <span class="premio-label">Figurinha desbloqueada</span>
+    <img src="${caminhoFigurinhaPremio(numero)}" alt="Figurinha ${n2}" onerror="fallbackFigurinhaPremio(this, ${numero})">
+    <b>Você ganhou a figurinha ${n2}</b>
+    <small>Ela já foi enviada para o seu álbum. Volte e clique em colar.</small>
+  `;
+}
+
 function textoPremioGame(numero) {
   if (!numero) return "";
   return `\n\n🎁 Recompensa: você ganhou a figurinha ${String(numero).padStart(2, "0")} no álbum.`;
@@ -1179,13 +1206,13 @@ function checkWin() {
       openModal(
         "Missão concluída!",
         "Você concluiu todas as fases e ganhou uma figurinha por esta tentativa." + textoPremioGame(premioGame),
-        { primaryText: "Reiniciar jogo", primaryAction: () => { closeModal(); resetGame(); } }
+        { primaryText: "Reiniciar jogo", primaryAction: () => { closeModal(); resetGame(); }, premioNumero: premioGame }
       );
     } else {
       openModal(
         "Fase vencida!",
         "Você concluiu a fase e pode avançar para o próximo layout." + textoPremioGame(premioGame),
-        { primaryText: "Próxima fase", primaryAction: () => { closeModal(); nextPhase(); } }
+        { primaryText: "Próxima fase", primaryAction: () => { closeModal(); nextPhase(); }, premioNumero: premioGame }
       );
     }
   }
@@ -1203,7 +1230,8 @@ function checkEndByMoves() {
       primaryText: "Tentar novamente",
       primaryAction: () => { closeModal(); restartCurrentPhase(); },
       secondaryText: "Fechar",
-      secondaryAction: closeModal
+      secondaryAction: closeModal,
+      premioNumero: premioGame
     }
   );
 }
@@ -1215,6 +1243,17 @@ function restartCurrentPhase() {
 function openModal(title, text, options = {}) {
   modalTitulo.textContent = title;
   modalTexto.textContent = text;
+
+  if (modalPremio) {
+    if (options.premioNumero) {
+      modalPremio.innerHTML = htmlPremioGame(options.premioNumero);
+      modalPremio.classList.remove("escondido");
+    } else {
+      modalPremio.innerHTML = "";
+      modalPremio.classList.add("escondido");
+    }
+  }
+
   btnModalPrincipal.textContent = options.primaryText || "Continuar";
   modalPrimaryAction = options.primaryAction || closeModal;
 

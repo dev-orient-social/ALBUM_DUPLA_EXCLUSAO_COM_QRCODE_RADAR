@@ -237,3 +237,51 @@ body {
     opacity: 0;
   }
 }
+
+
+/* Recompensa visual dentro do game */
+.modal-premio{
+  margin:14px auto 4px;
+  padding:12px;
+  border-radius:18px;
+  background:linear-gradient(135deg,#fff7cc,#e0f2fe,#dcfce7);
+  border:3px solid #facc15;
+  color:#111827;
+  box-shadow:0 8px 22px rgba(0,0,0,.25);
+}
+.modal-premio .premio-label{
+  display:inline-block;
+  margin-bottom:8px;
+  padding:5px 10px;
+  border-radius:999px;
+  background:#111827;
+  color:#facc15;
+  font-weight:900;
+  text-transform:uppercase;
+  font-size:.72rem;
+}
+.modal-premio img{
+  width:min(260px,82vw);
+  max-height:210px;
+  object-fit:contain;
+  display:block;
+  margin:0 auto 8px;
+  border-radius:14px;
+  background:#0f172a;
+  border:2px solid rgba(17,24,39,.3);
+}
+.modal-premio b{
+  display:block;
+  font-size:1.05rem;
+  color:#111827;
+}
+.modal-premio small{
+  display:block;
+  margin-top:4px;
+  font-weight:700;
+  color:#374151;
+}
+@media(max-width:760px){
+  .modal-box{max-height:92vh;overflow:auto}
+  .modal-premio img{max-height:180px}
+}
