@@ -295,6 +295,7 @@ button{font-family:inherit;cursor:pointer}
   <nav>
     <button id="btnCapa">Capa</button>
     <button id="btnSimulado">Simulado</button>
+    <button id="btnGame">Game</button>
     <button id="btnPacotes">Pacotes: <span id="pacotesTopo">3</span></button>
     <button id="btnRepetidasTopo">Repetidas: <span id="repetidasTopo">0</span></button>
     <button id="btnReiniciarTopo">Reiniciar</button>
@@ -1270,14 +1271,14 @@ function capaHTML(){
         <div class="nomes">Antônio Vitor Anselmo Carvalho</div>
         <div class="nomes">Gabrielly Rodrigues Oliveira</div>
       </div>
-      <p><b>Primeira vez:</b> 3 pacotes liberados. Depois, novos pacotes são conquistados pelo simulado.</p>
+      <p><b>Primeira vez:</b> 3 pacotes liberados. Depois, novos pacotes são conquistados pelo simulado, e o game libera 1 figurinha a cada tentativa concluída.</p>
     </div>
     <div class="creditos">${CREDITOS}</div>
   </div>`;
 }
 function especialHTML(p){
   if(p.tipo==="capa") return capaHTML();
-  if(p.tipo==="como") return `${creditosHTML()}<div class="pagina-especial"><h2>Apresentação do trabalho</h2><div class="info-apresentacao-pagina"><h3>Turma: 8º ano</h3><div><strong>Alunos apresentadores</strong></div><div class="nomes">Antônio Vitor Anselmo Carvalho</div><div class="nomes">Gabrielly Rodrigues Oliveira</div></div><div><p>1. Abra os 3 pacotes iniciais. Cada pacote mostra 5 figurinhas.</p><p>2. As figurinhas recebidas ficam disponíveis, mas não colam automaticamente.</p><p>3. Vá até a página correspondente e clique em <b>Colar figurinha</b>.</p><p>4. Só depois de colada a ficha técnica será aberta.</p></div><div class="info-grid"><div class="info-card"><b>Figurinhas</b><span>72</span></div><div class="info-card"><b>Pacote</b><span>5</span></div><div class="info-card"><b>Início</b><span>3 pacotes</span></div><div class="info-card"><b>Simulado</b><span>+1 ou +3</span></div></div></div>`;
+  if(p.tipo==="como") return `${creditosHTML()}<div class="pagina-especial"><h2>Apresentação do trabalho</h2><div class="info-apresentacao-pagina"><h3>Turma: 8º ano</h3><div><strong>Alunos apresentadores</strong></div><div class="nomes">Antônio Vitor Anselmo Carvalho</div><div class="nomes">Gabrielly Rodrigues Oliveira</div></div><div><p>1. Abra os 3 pacotes iniciais. Cada pacote mostra 5 figurinhas.</p><p>2. As figurinhas recebidas ficam disponíveis, mas não colam automaticamente.</p><p>3. Vá até a página correspondente e clique em <b>Colar figurinha</b>.</p><p>4. Só depois de colada a ficha técnica será aberta.</p></div><div class="info-grid"><div class="info-card"><b>Figurinhas</b><span>72</span></div><div class="info-card"><b>Pacote</b><span>5</span></div><div class="info-card"><b>Início</b><span>3 pacotes</span></div><div class="info-card"><b>Simulado</b><span>+1 ou +3</span></div><div class="info-card"><b>Game</b><span>+1 figurinha</span></div></div></div>`;
   if(p.tipo==="simulado"){
     const t=totais();
     return `${creditosHTML()}<div class="pagina-especial"><h2>Simulado do Tema</h2><div><p>Responda 10 questões sobre racismo, capacitismo, acessibilidade e inclusão escolar.</p><p><b>10 acertos:</b> ganha 3 pacotes. <b>Até 9 acertos:</b> ganha 1 pacote.</p><p><b>Regra:</b> ao responder um simulado, ele fica bloqueado e só libera os restantes. Ao concluir os 5, todos ficam liberados novamente.</p></div><div class="info-grid"><div class="info-card"><b>10 acertos</b><span>3 pacotes</span></div><div class="info-card"><b>Até 9 acertos</b><span>1 pacote</span></div><div class="info-card"><b>Figurinhas por pacote</b><span>5</span></div><div class="info-card"><b>Pacotes disponíveis</b><span>${t.pacotes}</span></div></div><button class="btn-dourado" onclick="abrirQuiz()">Iniciar simulado</button></div>`;
@@ -1669,6 +1670,8 @@ document.getElementById("inputCodigoBrinde").addEventListener("keydown",e=>{if(e
 document.getElementById("fecharPacote").onclick=()=>document.getElementById("modalPacote").classList.remove("ativo");
 document.getElementById("fecharFicha").onclick=()=>document.getElementById("modalFicha").classList.remove("ativo");
 document.getElementById("btnSimulado").onclick=abrirQuiz;
+function abrirGame(){ window.location.href = "game/index.html"; }
+["btnGame","btnGameLateral"].forEach(id=>{const el=document.getElementById(id); if(el) el.onclick=abrirGame;});
 document.getElementById("fecharQuiz").onclick=()=>document.getElementById("modalQuiz").classList.remove("ativo");
 setupAudio(); salvar(); renderLivro();
 </script>
